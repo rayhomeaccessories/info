@@ -147,7 +147,7 @@ body.lamp-on .lamp-hint{color:rgba(255,236,206,.85);background:rgba(60,45,30,.35
   cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;
   perspective:220px;
   transform-origin:top right;
-  transition:box-shadow .7s, border-color .7s, transform .55s ease, opacity .55s ease;
+  transition:box-shadow .7s, border-color .7s;
 }
 .wall-switch:focus-visible{outline:3px solid rgba(255,196,120,.85);outline-offset:3px}
 .wall-switch:active .rocker{transition-duration:.12s}
@@ -181,9 +181,7 @@ body.lamp-on .wall-switch{
 @media (max-width:420px){
   .wall-switch{top:98px;right:10px}
 }
-.lamp-hold{transform-origin:50% 0;transition:transform .55s ease, opacity .55s ease}
-body.scrolled .lamp-hold{transform:scale(.5);opacity:.42}
-body.scrolled .wall-switch{transform:scale(.62);opacity:.38}
+.lamp-hold{transform-origin:50% 0}
 @keyframes sway{0%,100%{transform:rotate(-1.7deg)}50%{transform:rotate(1.7deg)}}
 @keyframes lampDrop{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:translateY(0)}}
 @media (max-width:420px){
@@ -548,6 +546,7 @@ footer{animation-delay:.76s}
   var lampBtn = document.getElementById('lampBtn');
   var wallSwitch = document.getElementById('wallSwitch');
   var hint = document.getElementById('lampHint');
+  var lampHold = document.querySelector('.lamp-hold');
   function sync(on){
     document.body.classList.toggle('lamp-on', on);
     lampBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -559,12 +558,23 @@ footer{animation-delay:.76s}
   }
   lampBtn.addEventListener('click', toggle);
   wallSwitch.addEventListener('click', toggle);
-  window.addEventListener('scroll', function(){
+  function onScroll(){
     var y = window.scrollY || document.documentElement.scrollTop || 0;
     if (y > 40) hint.classList.add('hidden');
-    document.body.classList.toggle('scrolled', y > 60);
-  }, {passive:true});
+    var p = Math.min(y / 150, 1);          // gradual fade over 150px
+    var s = 1 - 0.55 * p;                  // shrink as they fade
+    lampHold.style.opacity = String(1 - p);
+    lampHold.style.transform = 'scale(' + s + ')';
+    wallSwitch.style.opacity = String(1 - p);
+    wallSwitch.style.transform = 'scale(' + s + ')';
+    var hidden = p >= 1 ? 'hidden' : 'visible';
+    lampHold.style.visibility = hidden;
+    wallSwitch.style.visibility = hidden;
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll, {passive:true});
+  onScroll();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d1a2d86d57e23f',t:'MTc5MjQzMjM0MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d1aee67b2fe189',t:'MTc5MjQzMjgzNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
