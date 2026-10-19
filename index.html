@@ -41,11 +41,9 @@ body{
     radial-gradient(820px 560px at 108% 6%, rgba(197,176,157,.22), rgba(197,176,157,0) 55%),
     radial-gradient(820px 560px at -8% 92%, rgba(197,176,157,.20), rgba(197,176,157,0) 55%);
   background-attachment:fixed;
-/* hide scrollbar (page still scrolls) */
-html{scrollbar-width:none;-ms-overflow-style:none}
-html::-webkit-scrollbar{width:0;height:0;display:none}
-body{scrollbar-width:none;-ms-overflow-style:none}
-body::-webkit-scrollbar{width:0;height:0;display:none}
+/* hide scrollbar everywhere (page still scrolls) */
+html,body{scrollbar-width:none;-ms-overflow-style:none;overflow-x:hidden}
+*::-webkit-scrollbar{width:0 !important;height:0 !important;display:none !important}
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
@@ -76,8 +74,124 @@ body::before{
 .share-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi);border-color:var(--taupe)}
 .share-btn:active{transform:scale(.95)}
 .share-btn svg{width:20px;height:20px}
+/* ---------- lamp / warm light ---------- */
+.night{
+  position:fixed;inset:0;z-index:40;pointer-events:none;
+  background:radial-gradient(120% 95% at 50% -5%, rgba(28,20,12,.28), rgba(16,11,7,.62) 75%);
+  opacity:0;transition:opacity .9s ease;
+}
+.lamp-pool{
+  position:fixed;inset:0;z-index:41;pointer-events:none;
+  background:radial-gradient(58% 40% at 50% 10%, rgba(255,193,112,.42), rgba(255,193,112,0) 72%);
+  opacity:0;transition:opacity .9s ease;
+}
+.lamp-zone{
+  position:fixed;top:0;left:0;right:0;z-index:45;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+  animation:lampDrop 1s cubic-bezier(.2,.8,.25,1) both;
+}
+.lamp{
+  pointer-events:auto;
+  background:none;border:0;padding:0;cursor:pointer;
+  transform-origin:50% 0;
+  animation:sway 5.2s ease-in-out infinite;
+}
+.lamp:focus-visible{outline:3px solid rgba(255,196,120,.85);outline-offset:4px;border-radius:14px}
+.lamp-svg{width:132px;height:auto;display:block;overflow:visible}
+.lamp .cord{stroke:#A98F79;stroke-width:3.4;stroke-linecap:round;transition:stroke .9s}
+.lamp .cap{fill:#A98F79;transition:fill .9s}
+.lamp .shade{fill:#C5B09D;transition:fill .9s}
+.lamp .rim{fill:#A98F79;transition:fill .9s}
+.lamp .bulb{fill:#8A7565;transition:fill .9s,filter .9s}
+body.lamp-on .lamp .shade{fill:#EFD9BB}
+body.lamp-on .lamp .rim{fill:#D2B187}
+body.lamp-on .lamp .bulb{fill:#FFD98A;filter:drop-shadow(0 0 14px rgba(255,190,100,.95))}
+.lamp-glow{
+  position:absolute;top:121px;left:50%;transform:translate(-50%,-50%);
+  width:380px;height:380px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle, rgba(255,196,118,.5), rgba(255,196,118,0) 65%);
+  opacity:0;transition:opacity .9s ease;
+}
+.lamp-cone{
+  position:absolute;top:111px;left:50%;transform:translateX(-50%);
+  width:320px;height:250px;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,201,128,.38), rgba(255,201,128,0) 78%);
+  clip-path:polygon(26% 0, 74% 0, 100% 100%, 0% 100%);
+  opacity:0;transition:opacity .9s ease;
+}
+body.lamp-on .night{opacity:1}
+body.lamp-on .lamp-pool{opacity:1}
+body.lamp-on .lamp-glow{opacity:1}
+body.lamp-on .lamp-cone{opacity:1}
+.avatar{transition:box-shadow .9s ease}
+body.lamp-on .avatar{box-shadow:0 14px 46px rgba(255,186,104,.45)}
+.brand{transition:text-shadow .9s ease}
+body.lamp-on .brand{text-shadow:0 0 44px rgba(255,190,110,.4)}
+.lamp-hint{
+  pointer-events:auto;
+  margin-top:6px;font-size:.78rem;font-weight:500;letter-spacing:.04em;
+  color:rgba(34,34,34,.55);
+  background:rgba(255,253,248,.6);border:1px solid rgba(197,176,157,.45);
+  padding:5px 14px;border-radius:999px;
+  transition:opacity .7s ease,color .9s,background .9s,border-color .9s;
+}
+body.lamp-on .lamp-hint{color:rgba(255,236,206,.85);background:rgba(60,45,30,.35);border-color:rgba(255,200,130,.35)}
+.lamp-hint.hidden{opacity:0;pointer-events:none}
+.wall-switch{
+  position:fixed;top:112px;right:18px;z-index:46;
+  width:56px;height:98px;border-radius:14px;padding:8px 7px;
+  background:linear-gradient(180deg,#FFFDF8,#F2E7D5);
+  border:1.5px solid rgba(169,143,121,.55);
+  box-shadow:0 12px 26px rgba(80,58,40,.16), inset 0 1px 0 rgba(255,255,255,.85);
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;
+  perspective:220px;
+  transform-origin:top right;
+  transition:box-shadow .7s, border-color .7s, transform .55s ease, opacity .55s ease;
+}
+.wall-switch:focus-visible{outline:3px solid rgba(255,196,120,.85);outline-offset:3px}
+.wall-switch:active .rocker{transition-duration:.12s}
+.led{
+  width:8px;height:8px;border-radius:50%;flex:none;
+  background:#C9B79F;box-shadow:inset 0 1px 2px rgba(0,0,0,.25);
+  transition:background .6s, box-shadow .6s;
+}
+body.lamp-on .led{background:#FFC46E;box-shadow:0 0 10px rgba(255,180,90,.9)}
+.rocker{
+  width:100%;flex:1;border-radius:9px;
+  background:linear-gradient(180deg,#EFE4D2,#D8C6AE);
+  box-shadow:inset 0 2px 5px rgba(90,66,45,.18);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;
+  font-size:.56rem;font-weight:700;letter-spacing:.12em;color:rgba(34,34,34,.7);
+  transform:rotateX(14deg);
+  transition:transform .45s cubic-bezier(.3,.8,.3,1), background .7s;
+}
+body.lamp-on .rocker{
+  transform:rotateX(-14deg);
+  background:linear-gradient(180deg,#F7E7C9,#E7D0A8);
+}
+.sw-on{opacity:.38;transition:opacity .45s}
+.sw-off{opacity:1;transition:opacity .45s}
+body.lamp-on .sw-on{opacity:1}
+body.lamp-on .sw-off{opacity:.38}
+body.lamp-on .wall-switch{
+  box-shadow:0 12px 30px rgba(255,180,90,.28), 0 0 0 1px rgba(255,196,120,.35), inset 0 1px 0 rgba(255,255,255,.85);
+  border-color:rgba(210,177,135,.8);
+}
+@media (max-width:420px){
+  .wall-switch{top:98px;right:10px}
+}
+.lamp-hold{transform-origin:50% 0;transition:transform .55s ease, opacity .55s ease}
+body.scrolled .lamp-hold{transform:scale(.5);opacity:.42}
+body.scrolled .wall-switch{transform:scale(.62);opacity:.38}
+@keyframes sway{0%,100%{transform:rotate(-1.7deg)}50%{transform:rotate(1.7deg)}}
+@keyframes lampDrop{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width:420px){
+  .lamp-svg{width:116px}
+  .hero{padding-top:145px !important}
+}
 /* ---------- header ---------- */
-.hero{text-align:center;padding-top:18px}
+.hero{text-align:center;padding-top:155px}
 .avatar-wrap{position:relative;display:inline-block}
 .avatar-glow{
   position:absolute;inset:-28px;border-radius:50%;
@@ -249,6 +363,31 @@ footer{animation-delay:.76s}
 </style>
 </head>
 <body>
+<div class="night" aria-hidden="true"></div>
+<div class="lamp-pool" aria-hidden="true"></div>
+<div class="lamp-zone">
+  <div class="lamp-hold">
+  <button class="lamp" id="lampBtn" aria-pressed="false" aria-label="Toggle warm lamp light">
+    <svg class="lamp-svg" viewBox="0 0 120 122" aria-hidden="true">
+      <line class="cord" x1="60" y1="0" x2="60" y2="46"/>
+      <rect class="cap" x="51" y="0" width="18" height="8" rx="4"/>
+      <path class="shade" d="M43 46 H77 L95 92 H25 Z"/>
+      <path class="rim" d="M25 92 H95 L87 101 H33 Z"/>
+      <circle class="bulb" cx="60" cy="110" r="8.5"/>
+    </svg>
+  </button>
+  </div>
+  <div class="lamp-glow" aria-hidden="true"></div>
+  <div class="lamp-cone" aria-hidden="true"></div>
+  <p class="lamp-hint" id="lampHint">Tap the lamp</p>
+</div>
+<button class="wall-switch" id="wallSwitch" aria-pressed="false" aria-label="Wall light switch">
+  <span class="led" aria-hidden="true"></span>
+  <span class="rocker" aria-hidden="true">
+    <span class="sw-on">ON</span>
+    <span class="sw-off">OFF</span>
+  </span>
+</button>
 <main class="wrap">
   <button class="share-btn" id="shareBtn" aria-label="Share this page" title="Share">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
@@ -404,6 +543,28 @@ footer{animation-delay:.76s}
   });
 })();
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d124d01fea6073',t:'MTc5MjQyNzE3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>
+(function(){
+  var lampBtn = document.getElementById('lampBtn');
+  var wallSwitch = document.getElementById('wallSwitch');
+  var hint = document.getElementById('lampHint');
+  function sync(on){
+    document.body.classList.toggle('lamp-on', on);
+    lampBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    wallSwitch.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function toggle(){
+    sync(!document.body.classList.contains('lamp-on'));
+    hint.classList.add('hidden');
+  }
+  lampBtn.addEventListener('click', toggle);
+  wallSwitch.addEventListener('click', toggle);
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    if (y > 40) hint.classList.add('hidden');
+    document.body.classList.toggle('scrolled', y > 60);
+  }, {passive:true});
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4d1a2d86d57e23f',t:'MTc5MjQzMjM0MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
